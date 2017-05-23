@@ -8,17 +8,20 @@ var starshipPage = require('../pages/starship.js')
 var helpPage = require('../pages/help.js')
 var privacyPage = require('../pages/privacy.js')
 
+
 module.exports = {
   'default e2e tests': function (browser) {
     browser
       .url(browser.globals.devServerURL)
       .waitForElementVisible(ui.dev.select, 5000)
+      .assert.title("Force Vue")
       .assert.elementPresent(personPage.elements.randomPersonButton)
       .pause(2000)
       .end()
   },
 
-  'verify person record has seven table records': function (browser) {
+
+'verify person record has seven table records': function (browser) {
     browser
       .url(browser.globals.devServerURL)
       .waitForElementVisible(ui.dev.select, 5000)
@@ -35,6 +38,7 @@ module.exports = {
       .pause(2000)
       .end()
   },
+
 
   'verify planet record has nine table records': function (browser) {
     browser
@@ -60,6 +64,7 @@ module.exports = {
       .pause(2000)
       .end()
   },
+
 
   'verify starship record has thirteen table records': function (browser) {
     browser
@@ -89,6 +94,7 @@ module.exports = {
       .end()
   },
 
+
   'verify selecting random person: name field not empty': function (browser) {
     browser
       .url(browser.globals.devServerURL)
@@ -101,6 +107,7 @@ module.exports = {
       .end()
   },
 
+
   'verify person button has expected value: face RANDOM PERSON': function (browser) {
     browser
       .url(browser.globals.devServerURL)
@@ -110,6 +117,7 @@ module.exports = {
       })
       .end()
   },
+
 
   'verify planet button has expected value: public RANDOM PLANET': function (browser) {
     browser
@@ -126,6 +134,24 @@ module.exports = {
       })
       .end()
   },
+
+
+ 'verify startship button has expected value: public RANDOM STARTSHIP': function (browser) {
+    browser
+      .url(browser.globals.devServerURL)
+      .waitForElementVisible(ui.dev.select, 5000)
+      .setValue(ui.dev.select,ui.dev.selectValue.starship)
+      .click(ui.dev.select)
+      .pause(1000)
+      .keys(['\uE006'])
+      .pause(3000)
+      .assert.elementPresent(starshipPage.elements.randomStarshipButton)
+      .getText(starshipPage.elements.randomStarshipButton, function(result) {
+        this.assert.equal(result.value,'public RANDOM STARSHIP')
+      })
+      .end()
+  },
+
 
   'starship e2e tests': function (browser) {
     browser
@@ -146,6 +172,7 @@ module.exports = {
       .end()
   },
 
+
   'verify that help page loads with the correct title': function (browser) {
     browser
       .url(browser.globals.devServerURL)
@@ -156,6 +183,8 @@ module.exports = {
       })
       .end()
   },
+
+
   'verify that privacy and terms page loads with the correct title': function (browser) {
     browser
       .url(browser.globals.devServerURL)
@@ -165,5 +194,144 @@ module.exports = {
         this.assert.equal(text.value, 'Privacy & Terms')
       })
       .end()
+  },
+
+
+'verify that about page loads with the correct title': function (browser) {
+    browser
+      .url(browser.globals.devServerURL)
+      .waitForElementVisible(ui.dev.select, 5000)
+      .useXpath()
+      .click("/html/body/div[1]/div/div/header/div[3]/nav/a[2]")
+      .pause(1000)
+      .assert.elementPresent("/html/body/div[1]/div/div/main/div/div/div/div[1]/h2")
+      .getText("/html/body/div[1]/div/div/main/div/div/div/div[1]/h2", function(text) {
+      this.assert.equal(text.value, 'About')
+      })
+      .useCss()
+      .end()
+  },
+
+
+'verify that contact page loads with the correct title and all elements are present': function (browser) {
+    browser
+      .url(browser.globals.devServerURL)
+      .waitForElementVisible(ui.dev.select, 5000)
+      .useXpath()
+      .click("/html/body/div[1]/div/div/header/div[3]/nav/a[3]")
+      .pause(1000)
+      .assert.elementPresent("/html/body/div[1]/div/div/main/div/div/div/div[1]/h2")
+      .getText("/html/body/div[1]/div/div/main/div/div/div/div[1]/h2", function(text) {
+        this.assert.equal(text.value, 'Contact')
+      })
+      .assert.elementPresent("/html/body/div[1]/div/div/main/div/div/div/div[3]/form/div[1]")
+      .getText("/html/body/div[1]/div/div/main/div/div/div/div[3]/form/div[1]", function(text) {
+        this.assert.equal(text.value, 'Name')
+      })
+      .assert.elementPresent("/html/body/div[1]/div/div/main/div/div/div/div[3]/form/div[2]")
+      .getText("/html/body/div[1]/div/div/main/div/div/div/div[3]/form/div[2]", function(text) {
+        this.assert.equal(text.value, 'Email')
+      })
+       .assert.elementPresent("/html/body/div[1]/div/div/main/div/div/div/div[3]/form/div[3]")
+       .getText("/html/body/div[1]/div/div/main/div/div/div/div[3]/form/div[3]", function(text) {
+        this.assert.equal(text.value, 'Note')
+      })
+      .assert.elementPresent("/html/body/div[1]/div/div/main/div/div/div/div[3]/form/p/button")
+      .getText("/html/body/div[1]/div/div/main/div/div/div/div[3]/form/p/button", function(text) {
+       this.assert.equal(text.value, 'SUBMIT')
+       })
+      .pause(1000)
+      .useCss()
+      .end()
+  },
+
+
+ 'verify that selecting help page does not break/change home page' : function (browser) {
+    browser
+      .url(browser.globals.devServerURL)
+      .waitForElementVisible(ui.dev.select, 5000)
+      .click(helpPage.elements.helpLink)
+      .getText(helpPage.elements.helpTitle, function(text) {
+        this.assert.equal(text.value, 'Help')
+      })
+      .useXpath()
+      .click("/html/body/div[1]/div/div/header/div[3]/nav/a[1]") //verifying if clicking on 'Home' returns to Home page;
+      .useCss()
+      .waitForElementVisible(ui.dev.select, 5000)
+      .assert.elementPresent(personPage.elements.randomPersonButton)
+      .pause(2000)
+      .end()
+  },
+
+
+  'verify that selecting privacy page does not break/change home page': function (browser) {
+    browser
+      .url(browser.globals.devServerURL)
+      .waitForElementVisible(ui.dev.select, 5000)
+      .click(privacyPage.elements.privacyLink)
+      .getText(privacyPage.elements.privacyTitle, function(text) {
+      this.assert.equal(text.value, 'Privacy & Terms')
+      })
+      .useXpath()
+      .click("/html/body/div[1]/div/div/header/div[3]/nav/a[1]") //verifying if clicking on 'Home' returns to Home page;
+      .useCss()
+      .waitForElementVisible(ui.dev.select, 5000)
+      .assert.elementPresent(personPage.elements.randomPersonButton)
+      .pause(2000)
+      .end()
+ },
+
+
+ 'verify that selecting privacy page, then selecting help page, then going back to Home page does not break pages': function (browser) {
+    browser
+      .url(browser.globals.devServerURL)
+      .waitForElementVisible(ui.dev.select, 5000)
+      .click(privacyPage.elements.privacyLink)
+      .getText(privacyPage.elements.privacyTitle, function(text) {
+        this.assert.equal(text.value, 'Privacy & Terms')
+      })
+      .click(helpPage.elements.helpLink)
+      .getText(helpPage.elements.helpTitle, function(text) {
+        this.assert.equal(text.value, 'Help')
+      })
+      .useXpath()
+      .click("/html/body/div[1]/div/div/header/div[3]/nav/a[1]") //verifying if clicking on 'Home' returns to Home page;
+      .useCss()
+      .waitForElementVisible(ui.dev.select, 5000)
+      .assert.elementPresent(personPage.elements.randomPersonButton)
+      .pause(2000)
+      .end()
+
+ },
+
+
+'verify that selecting contact page, then selecting about page, then going back to Home page does not break/change pages': function (browser) {
+    browser
+      .url(browser.globals.devServerURL)
+      .waitForElementVisible(ui.dev.select, 5000)
+      .useXpath()
+      .click("/html/body/div[1]/div/div/header/div[3]/nav/a[3]")
+      .pause(1000)
+      .assert.elementPresent("/html/body/div[1]/div/div/main/div/div/div/div[1]/h2")
+      .getText("/html/body/div[1]/div/div/main/div/div/div/div[1]/h2", function(text) {
+        this.assert.equal(text.value, 'Contact')
+      })
+      .click("/html/body/div[1]/div/div/header/div[3]/nav/a[2]")
+      .pause(1000)
+      .assert.elementPresent("/html/body/div[1]/div/div/main/div/div/div/div[1]/h2")
+      .getText("/html/body/div[1]/div/div/main/div/div/div/div[1]/h2", function(text) {
+       this.assert.equal(text.value, 'About')
+      })
+      .click("/html/body/div[1]/div/div/header/div[3]/nav/a[1]") //verifying if clicking on 'Home' returns to Home page;
+      .useCss()
+      .waitForElementVisible(ui.dev.select, 5000)
+      .assert.elementPresent(personPage.elements.randomPersonButton)
+      .pause(2000)
+      .end()
+
   }
+
+
+
 }
+
